@@ -2,24 +2,21 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
+use App\Models\Doctor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Hash;
 
-class UserFactory extends Factory
+class DoctorFactory extends Factory
 {
-    protected $model = User::class;
+    protected $model = Doctor::class;
 
     public function definition()
     {
         return [
             'name' => $this->faker->name,
+            'specialty' => $this->faker->randomElement(['Cardiologista', 'Dermatologista', 'Neurologista', 'Pedriatra', 'Psiquiatra']),
             'email' => $this->faker->unique()->safeEmail,
-            'address' => $this->faker->address,
             'phone' => $this->faker->phoneNumber,
-            'password' => Hash::make('password'), 
-            'is_admin' => $this->faker->boolean(0),
         ];
     }
 }

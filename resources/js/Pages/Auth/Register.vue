@@ -11,6 +11,8 @@ const form = useForm({
     email: '',
     password: '',
     password_confirmation: '',
+    address: '',  // Novo campo
+    phone: '',    // Novo campo
 });
 
 const submit = () => {
@@ -56,40 +58,68 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.email" />
             </div>
 
-            <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+            <!-- Novo campo para Endereço e Telefone lado a lado -->
+            <div class="mt-4 flex space-x-4">
+                <div class="flex-1">
+                    <InputLabel for="address" value="Address" />
 
-                <TextInput
-                    id="password"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password"
-                    required
-                    autocomplete="new-password"
-                />
+                    <TextInput
+                        id="address"
+                        type="text"
+                        class="mt-1 block w-full"
+                        v-model="form.address"
+                        autocomplete="address"
+                    />
 
-                <InputError class="mt-2" :message="form.errors.password" />
+                    <InputError class="mt-2" :message="form.errors.address" />
+                </div>
+
+                <div class="flex-1">
+                    <InputLabel for="phone" value="Phone" />
+
+                    <TextInput
+                        id="phone"
+                        type="text"
+                        class="mt-1 block w-full"
+                        v-model="form.phone"
+                        autocomplete="tel"
+                    />
+
+                    <InputError class="mt-2" :message="form.errors.phone" />
+                </div>
             </div>
 
-            <div class="mt-4">
-                <InputLabel
-                    for="password_confirmation"
-                    value="Confirm Password"
-                />
+            <!-- Campos de senha lado a lado -->
+            <div class="mt-4 flex space-x-4">
+                <div class="flex-1">
+                    <InputLabel for="password" value="Password" />
 
-                <TextInput
-                    id="password_confirmation"
-                    type="password"
-                    class="mt-1 block w-full"
-                    v-model="form.password_confirmation"
-                    required
-                    autocomplete="new-password"
-                />
+                    <TextInput
+                        id="password"
+                        type="password"
+                        class="mt-1 block w-full"
+                        v-model="form.password"
+                        required
+                        autocomplete="new-password"
+                    />
 
-                <InputError
-                    class="mt-2"
-                    :message="form.errors.password_confirmation"
-                />
+                    <InputError class="mt-2" :message="form.errors.password" />
+                </div>
+
+                <div class="flex-1">
+                    <InputLabel for="password_confirmation" value="Confirm Password" />
+
+                    <TextInput
+                        id="password_confirmation"
+                        type="password"
+                        class="mt-1 block w-full"
+                        v-model="form.password_confirmation"
+                        required
+                        autocomplete="new-password"
+                    />
+
+                    <InputError class="mt-2" :message="form.errors.password_confirmation" />
+                </div>
             </div>
 
             <div class="mt-4 flex items-center justify-end">

@@ -3,7 +3,20 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\AppointmentController;
 use Inertia\Inertia;
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/doctors', [DoctorController::class, 'store'])->name('doctors.create');
+});
+Route::get('/doctors', [DoctorController::class, 'index']);
+Route::middleware('auth')->group(function () {
+    Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.create');
+});
+Route::get('/appointments/user/{userId}', [AppointmentController::class, 'getUserAppointments']);
+Route::put('/appointments/{appointmentId}', [AppointmentController::class, 'updateAppointment']);
+Route::delete('/appointments/{appointmentId}', [AppointmentController::class, 'deleteAppointment']);
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [

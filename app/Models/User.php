@@ -20,9 +20,14 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'address',
+        'phone',
         'password',
     ];
-
+    public function appointment()
+    {
+        return $this->hasMany(Appointment::class);
+    }
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -43,6 +48,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
         ];
     }
 }
