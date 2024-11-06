@@ -72,10 +72,10 @@ class AppointmentController extends Controller
             'duration' => $validated['duration'],
             'status' => 'pending'
         ]);
-        return response()->json([
-            'message' => 'Agendamento criado com sucesso!',
-            'appointment' => $appointment
-        ], 201);
+        return back()->with([
+            'success' => 'Agendamento criado com sucesso!',
+            'appointment' => $appointment,
+        ]);
     }
 
     public function deleteAppointment($appointmentId) {

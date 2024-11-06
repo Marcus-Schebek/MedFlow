@@ -100,6 +100,7 @@ const submitForm = async () => {
   try {
     await axios.put(`/appointments/${props.appointmentId}`, form.value);
     emit('alert', { type: 'success', message: 'Agendamento atualizado com sucesso!' });
+    handleClose();
   } catch (error) {
     emit('alert', { type: 'error', message: 'Erro ao atualizar agendamento.' });
   }

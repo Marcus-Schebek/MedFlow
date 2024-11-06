@@ -3,38 +3,31 @@
 
     <AuthenticatedLayout>
         <template #header>
-            <h2
-                class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200"
-            >
+            <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
                 Central de Atendimentos
             </h2>
         </template>
 
+        <!-- Alert -->
+        <div v-if="alert.message" :class="`alert ${alert.type === 'success' ? 'alert-success' : 'alert-error'}`" role="alert">
+            {{ alert.message }}
+            <button type="button" class="close" @click="clearAlert">&times;</button>
+        </div>
+
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div
-                    class="p-6 text-gray-900 dark:text-gray-100 flex space-x-4"
-                >
+                <div class="p-6 text-gray-900 dark:text-gray-100 flex space-x-4">
                     <template v-if="user && user.is_admin">
-                        <button
-                            @click="openModalDoctor"
-                            class="bg-blue-500 text-white px-4 py-2 rounded"
-                        >
+                        <button @click="openModalDoctor" class="bg-blue-500 text-white px-4 py-2 rounded">
                             Cadastrar Doutor
                         </button>
                     </template>
 
-                    <button
-                        @click="openModalAppointment"
-                        class="bg-blue-500 text-white px-4 py-2 rounded"
-                    >
+                    <button @click="openModalAppointment" class="bg-blue-500 text-white px-4 py-2 rounded">
                         Cadastrar Consulta
                     </button>
 
-                    <button
-                        @click="fetchAppointments"
-                        class="bg-green-500 text-white px-4 py-2 rounded"
-                    >
+                    <button @click="fetchAppointments" class="bg-green-500 text-white px-4 py-2 rounded">
                         Ver Agendamentos
                     </button>
                 </div>
@@ -46,40 +39,22 @@
         </Modal>
 
         <Modal :show="isModalAppointmentOpen" @close="closeModalAppointment">
-            <AppointmentForm />
+            <AppointmentForm :isModalOpen="isModalAppointmentOpen" @appointmentCreated="handleAppointmentCreated" />
         </Modal>
 
         <Modal :show="isModalAppointmentsOpen" @close="closeModalAppointments">
             <div v-if="appointments.length > 0">
-                <h2 class="text-lg text-white font-semibold mb-4 p-4">
-                    Seus Agendamentos
-                </h2>
+                <h2 class="text-lg text-white font-semibold mb-4 p-4">Seus Agendamentos</h2>
                 <ul>
-                    <li
-                        v-for="appointment in appointments"
-                        :key="appointment.id"
-                        class="mb-2 text-white p-4"
-                    >
-                        <p>
-                            <strong>Médico:</strong>
-                            {{ appointment.doctor.name }}
-                        </p>
+                    <li v-for="appointment in appointments" :key="appointment.id" class="mb-2 text-white p-4">
+                        <p><strong>Médico:</strong> {{ appointment.doctor.name }}</p>
                         <p><strong>Data:</strong> {{ appointment.date }}</p>
-                        <p>
-                            <strong>Duração:</strong>
-                            {{ appointment.duration }} minutos
-                        </p>
+                        <p><strong>Duração:</strong> {{ appointment.duration }} minutos</p>
                         <div class="flex space-x-2 mt-2">
-                            <button
-                                @click="openEditModal(appointment.id)"
-                                class="bg-yellow-500 text-white px-4 py-2 rounded"
-                            >
+                            <button @click="openEditModal(appointment.id)" class="bg-yellow-500 text-white px-4 py-2 rounded">
                                 Editar
                             </button>
-                            <button
-                                @click="deleteAppointment(appointment.id)"
-                                class="bg-red-500 text-white px-4 py-2 rounded"
-                            >
+                            <button @click="deleteAppointment(appointment.id)" class="bg-red-500 text-white px-4 py-2 rounded">
                                 Excluir
                             </button>
                         </div>
@@ -92,11 +67,7 @@
         </Modal>
 
         <Modal :show="isEditModalOpen" @close="closeEditModal">
-            <EditAppointmentForm
-                :appointmentId="selectedAppointmentId"
-                :doctors="doctorList"
-                @close="closeEditModal"
-            />
+            <EditAppointmentForm :appointmentId="selectedAppointmentId" :doctors="doctorList" @close="closeEditModal" />
         </Modal>
     </AuthenticatedLayout>
 </template>
@@ -114,28 +85,40 @@ import axios from "axios";
 const { props } = usePage();
 const user = props.auth.user;
 
+// Alert state
 const alert = ref({ type: "", message: "" });
 
+// Function to display alert and close modal for AppointmentForm
+const handleAppointmentCreated = (msg) => {
+    showAlert(msg);
+    closeModalAppointment(); // Close the appointment modal after success
+};
+
+// Function to show alert
 const showAlert = (msg) => {
     alert.value = msg;
     setTimeout(() => {
         alert.value = { type: "", message: "" };
-    }, 5000);
+    }, 5000); // Clear alert after 5 seconds
 };
 
+// Function to clear alert manually
 const clearAlert = () => {
     alert.value = { type: "", message: "" };
 };
 
+// Modal states
 const isModalDoctorOpen = ref(false);
 const isModalAppointmentOpen = ref(false);
 const isModalAppointmentsOpen = ref(false);
 const isEditModalOpen = ref(false);
 
+// Appointments data
 const appointments = ref([]);
 const selectedAppointmentId = ref(null);
 const doctorList = ref([]);
 
+// Open and close modal functions
 const openModalDoctor = () => (isModalDoctorOpen.value = true);
 const closeModalDoctor = () => (isModalDoctorOpen.value = false);
 
@@ -148,6 +131,7 @@ const closeEditModal = () => {
     selectedAppointmentId.value = null;
 };
 
+// Fetch appointments for user
 const fetchAppointments = async () => {
     try {
         const response = await axios.get(`/appointments/user/${user.id}`);
@@ -158,6 +142,7 @@ const fetchAppointments = async () => {
     }
 };
 
+// Open edit modal and load doctor list
 const openEditModal = async (appointmentId) => {
     try {
         selectedAppointmentId.value = appointmentId;
@@ -168,6 +153,7 @@ const openEditModal = async (appointmentId) => {
     }
 };
 
+// Delete an appointment
 const deleteAppointment = async (appointmentId) => {
     if (confirm("Tem certeza que deseja excluir este agendamento?")) {
         try {
@@ -181,6 +167,7 @@ const deleteAppointment = async (appointmentId) => {
     }
 };
 
+// Load doctor list
 const loadDoctorList = async () => {
     try {
         const response = await axios.get("/doctors");
@@ -200,10 +187,6 @@ const loadDoctorList = async () => {
     border-radius: 0.375rem;
 }
 
-.alert-dismissible {
-    padding-right: 2rem;
-}
-
 .alert-success {
     color: #155724;
     background-color: #d4edda;
@@ -214,5 +197,18 @@ const loadDoctorList = async () => {
     color: #721c24;
     background-color: #f8d7da;
     border-color: #f5c6cb;
+}
+
+.close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 0.75rem 1rem;
+    color: inherit;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
 }
 </style>

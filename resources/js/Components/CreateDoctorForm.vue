@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <h2 class="text-lg font-bold">Criar Doutor</h2>
+    <div class="doctorForm">
+        <h2 class="text-lg font-bold text-white">Criar Doutor</h2>
         <form @submit.prevent="submit">
             <div>
                 <label for="name" class="block text-white">Nome</label>
@@ -72,22 +72,54 @@ const clearMessage = () => {
 };
 
 const submit = async () => {
-    try {
-        // Envia o formulário para criar um doutor
-        await axios.post('/doctors', form.value);
-
-        // Define mensagem de sucesso e reseta o formulário
-        successMessage.value = "Doutor cadastrado com sucesso!";
-        form.value = { name: '', specialty: '', email: '', phone: '' };
-    } catch (error) {
-        // Define mensagem de erro em caso de falha
-        errorMessage.value = "Erro ao cadastrar o doutor.";
-        console.error(error);
-    }
+  try {
+    await axios.post('/doctors', form.value);
+    successMessage.value = "Doutor cadastrado com sucesso!";
+    emit('alert', { type: 'success', message: successMessage.value });
+    form.value = { name: '', specialty: '', email: '', phone: '' };
+  } catch (error) {
+    errorMessage.value = "Erro ao cadastrar o doutor.";
+    emit('alert', { type: 'error', message: errorMessage.value });
+  }
 };
 </script>
 
 <style scoped>
+.doctorForm {
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input, select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
 .alert {
     position: relative;
     padding: 0.75rem 1.25rem;

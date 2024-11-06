@@ -24,9 +24,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, watch, onMounted, defineEmits } from 'vue';
 import { useForm } from '@inertiajs/vue3';
 import axios from 'axios';
+
+// Props e Eventos
+const props = defineProps(['isModalOpen']);
+const emit = defineEmits(['appointmentCreated']);
 
 const form = useForm({
   doctor_id: '',
@@ -35,8 +39,8 @@ const form = useForm({
 });
 
 const doctors = ref([]);
-const message = ref('');
 
+// Função para buscar lista de doutores
 const fetchDoctors = () => {
   axios.get('/doctors')
     .then(response => {
@@ -47,22 +51,29 @@ const fetchDoctors = () => {
     });
 };
 
+// Função para submeter a consulta
 const submitAppointment = () => {
   form.post(route('appointments.create'), {
     onSuccess: () => {
-      emit('alert', { type: 'success', message: 'Consulta cadastrada com sucesso!' });
-      form.reset();
-      fetchDoctors(); 
+      emit("appointmentCreated", { type: "success", message: "Consulta cadastrada com sucesso!" });
+      form.reset(); // Limpa o formulário
     },
     onError: () => {
-      emit('alert', { type: 'error', message: 'Erro ao cadastrar consulta.' });
-      console.error("Erro ao cadastrar a consulta:", form.errors);
+      emit('appointmentCreated', { type: 'error', message: 'Erro ao cadastrar consulta.' });
     }
   });
 };
-fetchDoctors();
-</script>
 
+// Resetar o formulário ao fechar o modal
+watch(() => props.isModalOpen, (newVal) => {
+  if (!newVal) form.reset();
+});
+
+// Carregar os doutores ao montar o componente
+onMounted(() => {
+  fetchDoctors();
+});
+</script>
 <style scoped>
 .appointment-form {
   margin: 0 auto;
@@ -100,5 +111,4 @@ button {
 button:hover {
   background-color: #45a049;
 }
-
 </style>
